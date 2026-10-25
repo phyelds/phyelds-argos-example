@@ -43,7 +43,7 @@ sudo cmake --install argos3/build_simulator
 sudo ldconfig
 ```
 
-From this project's root (`phyelds-argos` 8.9.0 or later, from PyPI):
+From this project's root (`phyelds-argos` 8.10.0 or later, from PyPI):
 
 ```bash
 uv venv --python 3.13
@@ -107,11 +107,10 @@ def main() -> float:
     return distance
 ```
 
-`source`, `led` and `label` are the typed `Sensor` and `Actuator` objects of
-[robot.py](src/phyelds_argos_examples/robot.py), named once for every program;
-`velocity` is the one of `phyelds.libraries.device`.
+`source`, `led` and `label` are the typed `Sensor` and `Actuator` objects that
+`phyelds.argos` names once for the host's sensors and outputs, `velocity` included.
 `neighbors_distances()` and `neighbors_vectors()` consume locally measured maps;
-programs have no ARGoS imports. The gathering program reuses `cast_along` to
+programs import no ARGoS code, only these names. The gathering program reuses `cast_along` to
 integrate neighbor offsets, and election composes `elect_leader`, `distance_to`,
 `count_nodes` and `broadcast`. Election uses a deterministic candidacy strategy
 and a 64-hop bound, larger than the diameter of these small networks.
@@ -149,7 +148,7 @@ Measured ranges are three-dimensional, between the radios of robots of different
 ## Add an example
 
 1. Add an `@aggregate` function in `src/phyelds_argos_examples/<name>.py`.
-2. Read the sensors of `robot.py` with `.sense()` and neighbors with Phyelds field
+2. Read the sensors of `phyelds.argos` with `.sense()` and neighbors with Phyelds field
    operations. Send `velocity`, `led` and `label` with `.send(...)`.
 3. Copy an experiment and set `<params program="phyelds_argos_examples.<name>:main" />`.
 4. Test it on `Device` and in its ARGoS arena.

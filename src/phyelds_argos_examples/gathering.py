@@ -1,11 +1,11 @@
 """Gather at the elected leader, integrating radio vectors along a gradient."""
 import math
 
+from phyelds.argos import label, led, obstacle, velocity
 from phyelds.calculus import aggregate
 from phyelds.experimental.swarm import Vector, cast_along, neighbors_vectors
-from phyelds.libraries.device import local_id, velocity
+from phyelds.libraries.device import local_id
 from phyelds_argos_examples.common import hue, leader_id, repulsion
-from phyelds_argos_examples.robot import label, led, obstacle
 
 
 @aggregate

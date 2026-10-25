@@ -1,11 +1,11 @@
 """Static metric distance gradient from the configured source."""
 import math
 
+from phyelds.argos import label, led, source
 from phyelds.calculus import aggregate
 from phyelds.libraries.distances import neighbors_distances
 from phyelds.libraries.spreading import distance_to
 from phyelds_argos_examples.common import hue
-from phyelds_argos_examples.robot import label, led, source
 
 
 @aggregate

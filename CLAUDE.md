@@ -7,10 +7,10 @@ robot's simulated radio.
 
 - `src/phyelds_argos_examples/`: the aggregate programs, one module per example
   (`gradient`, `election`, `dispersion`, `gathering`, `flocking`); `common`: colours,
-  the leader and the repulsion they share; `robot`: the sensors (`source`, `heading`,
-  `obstacle`) and actuators (`led`, `label`) of phyelds-argos, as typed `Sensor` and
-  `Actuator` objects, never strings. The programs know nothing of ARGoS: they read with
-  `.sense()` and act with `.send(...)`, `velocity` included (`phyelds.libraries.device`).
+  the leader and the repulsion they share. The programs know nothing of ARGoS: they read
+  the host's sensors and act through the typed objects of `phyelds.argos` (`source`,
+  `heading`, `obstacle`; `velocity`, `led`, `label`), with `.sense()` and `.send(...)`,
+  never strings.
 - `experiments/`: one ARGoS experiment per example, and `mixed_*` ones that run the same
   programs on foot-bots, e-pucks and eye-bots together.
 - `tests/test_programs.py`: every program on `phyelds.vm.device.Device`, fed the sensors
@@ -116,7 +116,8 @@ pylint and flake8 enforce the mechanical part. Match the surrounding code first.
 - One module, one responsibility. An aggregate program says *what* the swarm does and
   knows nothing of ARGoS; the experiment declares the robots and their devices, and the
   plugin turns sensors into the program's inputs and its outputs into motors and lights.
-  Keep that direction: `phyelds_argos_examples` never imports anything of ARGoS.
+  Keep that direction: `phyelds_argos_examples` imports from `phyelds.argos` only the
+  names of the sensors and actuators, never ARGoS or the plugin.
 - Keep aggregate exchanges before local loops whose iteration counts differ among
   robots, or move the loop into a plain helper: otherwise later exchanges can take
   different alignment paths.

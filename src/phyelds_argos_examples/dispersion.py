@@ -1,9 +1,8 @@
 """Spread a packed swarm with a repulsive spring."""
+from phyelds.argos import label, led, obstacle, velocity
 from phyelds.calculus import aggregate
 from phyelds.experimental.swarm import Vector, neighbors_vectors
-from phyelds.libraries.device import velocity
 from phyelds_argos_examples.common import repulsion
-from phyelds_argos_examples.robot import label, led, obstacle
 
 
 @aggregate

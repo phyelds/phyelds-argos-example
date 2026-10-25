@@ -1,10 +1,10 @@
 """Elect a leader, collect the swarm size and spread the total back."""
+from phyelds.argos import label, led
 from phyelds.calculus import aggregate
 from phyelds.libraries.collect import count_nodes
 from phyelds.libraries.device import local_id
 from phyelds.libraries.spreading import broadcast, distance_to
 from phyelds_argos_examples.common import hue, leader_id
-from phyelds_argos_examples.robot import label, led
 
 
 @aggregate

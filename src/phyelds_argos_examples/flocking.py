@@ -1,11 +1,10 @@
 """Reynolds separation, cohesion and compass-heading alignment."""
 import math
 
+from phyelds.argos import heading, label, led, obstacle, velocity
 from phyelds.calculus import aggregate, neighbors
 from phyelds.experimental.swarm import Vector, neighbors_vectors
-from phyelds.libraries.device import velocity
 from phyelds_argos_examples.common import hue
-from phyelds_argos_examples.robot import heading, label, led, obstacle
 
 
 @aggregate

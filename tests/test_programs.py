@@ -3,10 +3,9 @@ import math
 
 import pytest
 
-from phyelds.libraries.device import velocity
+from phyelds.argos import heading, label, led, obstacle, source, velocity
 from phyelds.vm.device import Device
 from phyelds_argos_examples import dispersion, election, flocking, gathering, gradient
-from phyelds_argos_examples.robot import heading, label, led, obstacle, source
 
 
 def run_line(program, size, rounds, spacing=0.5, headings=None):
