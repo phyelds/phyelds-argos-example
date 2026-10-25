@@ -25,7 +25,7 @@ def observer():
 @pytest.fixture(scope="session")
 def experiments(observer):
     results = {}
-    for name in ("gradient", "election", "dispersion", "gathering", "flocking"):
+    for name in ("gradient", "election", "dispersion", "gathering", "flocking", "mixed_gradient", "mixed_flocking"):
         xml = (ROOT / "experiments" / f"{name}.argos").read_text().replace('length="0"', 'length="30"')
         config = ROOT / "build" / f"{name}.test.argos"
         config.write_text(xml)
@@ -61,8 +61,9 @@ def polarization(rows):
                       sum(math.sin(row[3]) for row in rows.values())) / len(rows)
 
 
-def test_gradient_matches_shortest_radio_paths(experiments):
-    poses, labels = experiments["gradient"]
+@pytest.mark.parametrize("name", ["gradient", "mixed_gradient"])
+def test_gradient_matches_shortest_radio_paths(experiments, name):
+    poses, labels = experiments[name]
     points = positions(poses[0])
     distances = {robot: float("inf") for robot in points}
     distances["fb0"] = 0
@@ -79,6 +80,12 @@ def test_gradient_matches_shortest_radio_paths(experiments):
     for robot, distance in distances.items():
         assert labels[robot] != "?", f"{robot} has no route to fb0"
         assert int(labels[robot][:-2]) / 100 == pytest.approx(distance, abs=0.02)
+
+
+def test_mixed_gradient_reaches_e_pucks_only_through_eye_bots(experiments):
+    points = positions(experiments["mixed_gradient"][0][0])
+    assert not any(math.dist(points[foot], points[puck]) <= 0.8
+                   for foot in points if foot.startswith("fb") for puck in points if puck.startswith("ep"))
 
 
 def test_election_reaches_consensus_and_elects_fb0(experiments):
@@ -113,3 +120,11 @@ def test_flocking_aligns_and_moves(experiments):
     assert alignment > 0.7 and alignment > polarization(poses[0]) + 0.3
     displacement = sum(math.dist(poses[300][robot][:2], row[:2]) for robot, row in poses[0].items()) / 30
     assert displacement > 0.5
+
+
+def test_mixed_flock_aligns_both_robot_types(experiments):
+    poses, _ = experiments["mixed_flocking"]
+    final = poses[300]
+    assert polarization(final) > 0.7
+    for kind in ("fb", "ep"):
+        assert polarization({robot: row for robot, row in final.items() if robot.startswith(kind)}) > 0.7

@@ -1,0 +1,106 @@
+<?xml version="1.0" ?>
+<!-- MIXED: the gradient crosses from foot-bots to e-pucks through hovering eye-bots. Run from the repository root: argos3 -c experiments/mixed_gradient.argos -->
+<argos-configuration>
+
+  <framework>
+    <system threads="0" />
+    <experiment length="0" ticks_per_second="10" random_seed="1" />
+  </framework>
+
+  <!-- One program; each robot type declares the devices it has. -->
+  <controllers>
+    <phyelds_controller id="footbot" library="build/libphyelds_argos">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds implementation="default" medium="leds" />
+        <range_and_bearing implementation="default" />
+      </actuators>
+      <sensors>
+        <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
+        <positioning implementation="default" />
+        <footbot_proximity implementation="default" show_rays="false" />
+      </sensors>
+      <params program="phyelds_argos_examples.gradient:main" source="0" />
+    </phyelds_controller>
+    <phyelds_controller id="epuck" library="build/libphyelds_argos">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds implementation="default" medium="leds" />
+        <range_and_bearing implementation="default" />
+      </actuators>
+      <sensors>
+        <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
+        <positioning implementation="default" />
+        <epuck_proximity implementation="default" show_rays="false" />
+      </sensors>
+      <params program="phyelds_argos_examples.gradient:main" source="0" />
+    </phyelds_controller>
+    <phyelds_controller id="eyebot" library="build/libphyelds_argos">
+      <actuators>
+        <quadrotor_speed implementation="default" />
+        <leds implementation="default" medium="leds" />
+        <range_and_bearing implementation="default" />
+      </actuators>
+      <sensors>
+        <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
+        <positioning implementation="default" />
+      </sensors>
+      <params program="phyelds_argos_examples.gradient:main" source="0" />
+    </phyelds_controller>
+  </controllers>
+
+  <!-- UIDs must be unique across types: base_num starts e-pucks at 100, eye-bots at 200. -->
+  <arena size="5, 5, 1.5" center="0, 0, 0.5">
+    <box id="wall_north" size="4, 0.1, 0.5" movable="false"><body position="0, 2, 0" orientation="0, 0, 0" /></box>
+    <box id="wall_south" size="4, 0.1, 0.5" movable="false"><body position="0, -2, 0" orientation="0, 0, 0" /></box>
+    <box id="wall_east" size="0.1, 4, 0.5" movable="false"><body position="2, 0, 0" orientation="0, 0, 0" /></box>
+    <box id="wall_west" size="0.1, 4, 0.5" movable="false"><body position="-2, 0, 0" orientation="0, 0, 0" /></box>
+    <foot-bot id="fb0" rab_range="0.8" rab_data_size="4096">
+      <body position="-1.5, 0, 0" orientation="0, 0, 0" /><controller config="footbot" />
+    </foot-bot>
+    <distribute>
+      <position method="uniform" min="-1.8, -1.8, 0" max="-0.5, 1.8, 0" />
+      <orientation method="uniform" min="0, 0, 0" max="360, 0, 0" />
+      <entity quantity="24" max_trials="100" base_num="1">
+        <foot-bot id="fb" rab_range="0.8" rab_data_size="4096"><controller config="footbot" /></foot-bot>
+      </entity>
+    </distribute>
+    <distribute>
+      <position method="uniform" min="0.5, -1.8, 0" max="1.8, 1.8, 0" />
+      <orientation method="uniform" min="0, 0, 0" max="360, 0, 0" />
+      <entity quantity="25" max_trials="100" base_num="100">
+        <e-puck id="ep" rab_range="0.8" rab_data_size="4096"><controller config="epuck" /></e-puck>
+      </entity>
+    </distribute>
+    <!-- Hovering 30 cm up, in the gap that no ground radio crosses. -->
+    <distribute>
+      <position method="grid" center="0, 0, 0.3" distances="0, 0.6, 0" layout="1, 6, 1" />
+      <orientation method="constant" values="0, 0, 0" />
+      <entity quantity="6" max_trials="1" base_num="200">
+        <eye-bot id="eb" rab_range="0.8" rab_data_size="4096"><controller config="eyebot" /></eye-bot>
+      </entity>
+    </distribute>
+  </arena>
+
+  <physics_engines>
+    <dynamics2d id="dyn2d" />
+    <pointmass3d id="pm3d" iterations="1" />
+  </physics_engines>
+
+  <media>
+    <range_and_bearing id="rab" check_occlusions="false" />
+    <led id="leds" />
+  </media>
+
+  <visualization>
+    <qt-opengl>
+      <user_functions library="build/libphyelds_argos_qt" label="phyelds_qtuser_functions" />
+      <camera>
+        <placements>
+          <placement index="0" position="0, 0, 6" look_at="0, 0, 0" up="0, 1, 0" lens_focal_length="30" />
+        </placements>
+      </camera>
+    </qt-opengl>
+  </visualization>
+
+</argos-configuration>

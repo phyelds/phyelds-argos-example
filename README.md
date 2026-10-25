@@ -4,7 +4,8 @@
 
 Five [Phyelds](https://github.com/phyelds/phyelds) programs run on foot-bots in
 [ARGoS3](https://github.com/ilpincy/argos3), matching the arenas and behaviors of
-the FCPP–ARGoS example. Every robot runs the same program, exchanging aggregate
+the FCPP–ARGoS example; two of them also run on mixed swarms of foot-bots, e-pucks
+and eye-bots. Every robot runs the same program, exchanging aggregate
 state **only over its simulated range-and-bearing radio**. There is no GPS:
 distances and relative vectors come from the radio; the positioning sensor is
 used only as a compass.
@@ -16,12 +17,16 @@ used only as a compass.
 | `dispersion` | A packed group spreads to about 0.6 m spacing; green means settled | [dispersion.py](src/phyelds_argos_examples/dispersion.py) |
 | `gathering` | Robots gather around the elected red leader, using vectors propagated along a gradient | [gathering.py](src/phyelds_argos_examples/gathering.py) |
 | `flocking` | Separation, cohesion and heading alignment; equal LED colours mean aligned headings | [flocking.py](src/phyelds_argos_examples/flocking.py) |
+| `mixed_gradient` | Foot-bots and e-pucks, separated by a gap that no ground radio crosses, linked by six hovering eye-bots | [gradient.py](src/phyelds_argos_examples/gradient.py) |
+| `mixed_flocking` | 15 foot-bots and 15 e-pucks flock together | [flocking.py](src/phyelds_argos_examples/flocking.py) |
 
 | Gradient | Election |
 |:---:|:---:|
 | ![Metric gradient around a radio path](docs/gradient.png) | ![Leader election and network size](docs/election.png) |
 | Dispersion | Gathering |
 | ![Robots spread out](docs/dispersion.gif) | ![Robots gather around their leader](docs/gathering.gif) |
+| Mixed gradient | Mixed flocking |
+| ![A gradient from foot-bots to e-pucks through eye-bots](docs/mixed_gradient.png) | ![Foot-bots and e-pucks flocking](docs/mixed_flocking.gif) |
 
 ## Run the examples
 
@@ -51,6 +56,8 @@ argos3 -c experiments/election.argos
 argos3 -c experiments/dispersion.argos
 argos3 -c experiments/gathering.argos
 argos3 -c experiments/flocking.argos
+argos3 -c experiments/mixed_gradient.argos
+argos3 -c experiments/mixed_flocking.argos
 ```
 
 Run from this directory: the experiment files load `build/libphyelds_argos` and
@@ -117,6 +124,25 @@ Velocities are in m/s in the common compass frame, capped by `max_speed` (defaul
 triples. The native plugin, build support and generic measured-geometry helpers
 belong to Phyelds; these programs, arenas, weights and recording tools belong here.
 
+## Mixed swarms
+
+The mixed experiments run the unchanged programs on several robot types. Robots talk
+when they share a medium, here `range_and_bearing`, so foot-bots, e-pucks and eye-bots
+form one network; Pi-Pucks, BuilderBots and drones use `simple_radios` instead. Each
+type needs:
+
+- its own `phyelds_controller` block, with the same `program`, declaring the devices
+  that type has (`footbot_proximity`, `epuck_proximity`, `quadrotor_speed`, …);
+  outputs a robot cannot act on are ignored;
+- the same `rab_range` and `rab_data_size`: each robot uses its own range when sending,
+  so different ranges would make one-way links;
+- unique numeric UIDs: `base_num` on `<entity>` starts e-puck IDs at 100 and eye-bot IDs
+  at 200;
+- its physics engine: ground robots in `dynamics2d`, eye-bots in `pointmass3d`. With no
+  velocity, an eye-bot hovers where it starts.
+
+Measured ranges are three-dimensional, between the radios of robots of different heights.
+
 ## Add an example
 
 1. Add an `@aggregate` function in `src/phyelds_argos_examples/<name>.py`.
@@ -131,10 +157,11 @@ Moving local vector arithmetic into an ordinary Python helper also avoids this.
 
 ## Verification and recordings
 
-The headless tests run all five experiments for 30 simulated seconds with seed 1.
+The headless tests run all seven experiments for 30 simulated seconds with seed 1.
 They compare the gradient to shortest radio paths, require 40/40 counting
 consensus, measure increased spacing and settling, check convergence towards a
-stationary leader, and measure flock polarization and displacement. A separate
+stationary leader, and measure flock polarization and displacement. For the mixed swarms they check that the
+gradient reaches every e-puck only through the eye-bots, and that both types align. A separate
 C++ **test observer** reads ground-truth poses for these assertions; they are
 never available to the aggregate programs. Logs are kept in `build/*.log`.
 
@@ -151,6 +178,8 @@ scripts/record.sh election 20 png
 scripts/record.sh dispersion 30 gif 3
 scripts/record.sh gathering 30 gif 3
 scripts/record.sh flocking 60 gif 5
+scripts/record.sh mixed_gradient 10 png
+scripts/record.sh mixed_flocking 60 gif 5
 ```
 
 Flocking and gathering use Phyelds's experimental swarm API, whose interface can

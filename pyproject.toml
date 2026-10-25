@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "phyelds-argos-example"
 version = "0.1.0"
-description = "Five aggregate robot-swarm examples with Phyelds and ARGoS"
+description = "Aggregate robot-swarm examples with Phyelds and ARGoS, on foot-bots and mixed swarms"
 authors = ["Gianluca Aguzzi <gianluca.aguzzi@unibo.it>"]
 license = "Apache-2.0"
 readme = "README.md"
