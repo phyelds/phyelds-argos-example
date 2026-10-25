@@ -100,13 +100,16 @@ The gradient is a whole swarm program:
 ```python
 @aggregate
 def main() -> float:
-    source = sense("source")
-    distance = float(distance_to(source, neighbors_distances()))
-    store("led", (255, 255, 255) if source else hue(min(distance, 6) * 45))
-    store("label", f"{int(distance * 100)}cm" if math.isfinite(distance) else "?")
+    is_source = source.sense()
+    distance = float(distance_to(is_source, neighbors_distances()))
+    led.send((255, 255, 255) if is_source else hue(min(distance, 6) * 45))
+    label.send(f"{int(distance * 100)}cm" if math.isfinite(distance) else "?")
     return distance
 ```
 
+`source`, `led` and `label` are the typed `Sensor` and `Actuator` objects of
+[robot.py](src/phyelds_argos_examples/robot.py), named once for every program;
+`velocity` is the one of `phyelds.libraries.device`.
 `neighbors_distances()` and `neighbors_vectors()` consume locally measured maps;
 programs have no ARGoS imports. The gathering program reuses `cast_along` to
 integrate neighbor offsets, and election composes `elect_leader`, `distance_to`,
@@ -146,8 +149,8 @@ Measured ranges are three-dimensional, between the radios of robots of different
 ## Add an example
 
 1. Add an `@aggregate` function in `src/phyelds_argos_examples/<name>.py`.
-2. Read sensors with `sense` and neighbors with Phyelds field operations. Write
-   `velocity`, `led`, and `label` with `store`.
+2. Read the sensors of `robot.py` with `.sense()` and neighbors with Phyelds field
+   operations. Send `velocity`, `led` and `label` with `.send(...)`.
 3. Copy an experiment and set `<params program="phyelds_argos_examples.<name>:main" />`.
 4. Test it on `Device` and in its ARGoS arena.
 

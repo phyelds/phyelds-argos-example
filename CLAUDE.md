@@ -6,9 +6,11 @@ Every robot runs the same aggregate program through the `phyelds_controller` of
 robot's simulated radio.
 
 - `src/phyelds_argos_examples/`: the aggregate programs, one module per example
-  (`gradient`, `election`, `dispersion`, `gathering`, `flocking`), and `common`: colours,
-  the leader and the repulsion they share. They know nothing of ARGoS: they read sensors
-  with `sense` and write `velocity`, `led` and `label` with `store`.
+  (`gradient`, `election`, `dispersion`, `gathering`, `flocking`); `common`: colours,
+  the leader and the repulsion they share; `robot`: the sensors (`source`, `heading`,
+  `obstacle`) and actuators (`led`, `label`) of phyelds-argos, as typed `Sensor` and
+  `Actuator` objects, never strings. The programs know nothing of ARGoS: they read with
+  `.sense()` and act with `.send(...)`, `velocity` included (`phyelds.libraries.device`).
 - `experiments/`: one ARGoS experiment per example, and `mixed_*` ones that run the same
   programs on foot-bots, e-pucks and eye-bots together.
 - `tests/test_programs.py`: every program on `phyelds.vm.device.Device`, fed the sensors
