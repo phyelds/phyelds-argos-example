@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "phyelds-argos-example"
+version = "0.1.0"
+description = "Five aggregate robot-swarm examples with Phyelds and ARGoS"
+authors = ["Gianluca Aguzzi <gianluca.aguzzi@unibo.it>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [{ include = "phyelds_argos_examples", from = "src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.14"
+phyelds-argos = "^8.8.6"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.0.3"
+pylint = "^3.0.0"
+flake8 = "^7.0.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["argos: requires an installed ARGoS3 and a built plugin"]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
