@@ -38,13 +38,12 @@ sudo cmake --install argos3/build_simulator
 sudo ldconfig
 ```
 
-For development, put this project next to a Phyelds checkout **containing the new
-`packages/phyelds-argos` integration**. From this project's root:
+From this project's root (`phyelds-argos` 8.9.0 or later, from PyPI):
 
 ```bash
 uv venv --python 3.13
 source .venv/bin/activate
-uv pip install -e ../phyelds -e ../phyelds/packages/phyelds-argos -e . pytest
+uv pip install -e . pytest
 python -m phyelds.argos.build --build-dir build
 
 argos3 -c experiments/gradient.argos
@@ -56,8 +55,8 @@ argos3 -c experiments/flocking.argos
 
 Run from this directory: the experiment files load `build/libphyelds_argos` and
 `build/libphyelds_argos_qt` by relative path. In the GUI, press ▶ to start.
-Once `phyelds-argos` is released, `pip install -e .` can replace the three local
-editable installs. Until then, a vanilla older Phyelds checkout is insufficient.
+To develop against a Phyelds checkout next to this project, install
+`-e ../phyelds -e ../phyelds/packages/phyelds-argos` too.
 
 If `argos3` aborts with `GLib-GIO-ERROR … does not contain a key named
 'antialiasing'`, the terminal belongs to a Snap application (e.g. VS Code) whose
