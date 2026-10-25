@@ -2,24 +2,28 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/simulator/space/space.h>
 #include <argos3/core/utility/plugins/dynamic_loading.h>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+#include <argos3/core/simulator/entity/composable_entity.h>
+#include <argos3/core/simulator/entity/embodied_entity.h>
 #include <argos3/plugins/simulator/entities/led_equipped_entity.h>
+#include <argos3/plugins/simulator/entities/rab_equipped_entity.h>
 #include <iostream>
 #include <argos3/core/utility/logging/argos_log.h>
 #include <iomanip>
 
 void Snapshot(argos::CSimulator& simulator) {
     auto& space = simulator.GetSpace();
-    for (auto& item : space.GetEntitiesByType("foot-bot")) {
-        auto* robot = argos::any_cast<argos::CFootBotEntity*>(item.second);
-        auto& anchor = robot->GetEmbodiedEntity().GetOriginAnchor();
+    for (auto* entity : space.GetRootEntityVector()) {
+        auto* robot = dynamic_cast<argos::CComposableEntity*>(entity);
+        if (!robot || !robot->HasComponent("controller")) continue; // walls
+        // Where the radio is: robots of different heights measure ranges between radios.
+        auto const& radio = robot->GetComponent<argos::CRABEquippedEntity>("rab").GetPosition();
         argos::CRadians yaw, pitch, roll;
-        anchor.Orientation.ToEulerAngles(yaw, pitch, roll);
-        auto color = robot->GetLEDEquippedEntity().GetLED(0).GetColor();
+        robot->GetComponent<argos::CEmbodiedEntity>("body").GetOriginAnchor().Orientation.ToEulerAngles(yaw, pitch, roll);
+        auto color = robot->GetComponent<argos::CLEDEquippedEntity>("leds").GetLED(0).GetColor();
         std::cout << "POSE " << space.GetSimulationClock() << ' ' << robot->GetId() << ' '
-            << std::setprecision(10) << anchor.Position.GetX() << ' ' << anchor.Position.GetY() << ' '
-            << yaw.GetValue() << ' ' << int(color.GetRed()) << ' ' << int(color.GetGreen()) << ' '
-            << int(color.GetBlue()) << '\n';
+            << std::setprecision(10) << radio.GetX() << ' ' << radio.GetY() << ' '
+            << radio.GetZ() << ' ' << yaw.GetValue() << ' ' << int(color.GetRed()) << ' '
+            << int(color.GetGreen()) << ' ' << int(color.GetBlue()) << '\n';
     }
 }
 

@@ -37,17 +37,17 @@ def experiments(observer):
         poses = {}
         for line in result.stdout.splitlines():
             if line.startswith("POSE "):
-                _, tick, robot, x, y, yaw, red, green, blue = line.split()
-                pose = (float(x), float(y), float(yaw), int(red), int(green), int(blue))
+                _, tick, robot, x, y, z, yaw, red, green, blue = line.split()
+                pose = (float(x), float(y), float(z), float(yaw), int(red), int(green), int(blue))
                 poses.setdefault(int(tick), {})[robot] = pose
-        labels = dict(re.findall(r"(fb\d+) final: (.*)", result.stdout))
+        labels = dict(re.findall(r"(\w+) final: (.*)", result.stdout))
         assert poses and labels, result.stdout
         results[name] = (poses, labels)
     return results
 
 
 def positions(rows):
-    return {robot: row[:2] for robot, row in rows.items()}
+    return {robot: row[:3] for robot, row in rows.items()}
 
 
 def nearest_mean(rows):
@@ -57,8 +57,8 @@ def nearest_mean(rows):
 
 
 def polarization(rows):
-    return math.hypot(sum(math.cos(row[2]) for row in rows.values()),
-                      sum(math.sin(row[2]) for row in rows.values())) / len(rows)
+    return math.hypot(sum(math.cos(row[3]) for row in rows.values()),
+                      sum(math.sin(row[3]) for row in rows.values())) / len(rows)
 
 
 def test_gradient_matches_shortest_radio_paths(experiments):
@@ -86,7 +86,7 @@ def test_election_reaches_consensus_and_elects_fb0(experiments):
     assert len(labels) == 40
     assert all(label.endswith("/40") for label in labels.values())
     assert labels["fb0"] == "0/40"
-    red = [robot for robot, row in poses[300].items() if row[3:] == (255, 0, 0)]
+    red = [robot for robot, row in poses[300].items() if row[4:] == (255, 0, 0)]
     assert red == ["fb0"]
 
 
@@ -94,7 +94,7 @@ def test_dispersion_increases_spacing_and_settles(experiments):
     poses, _ = experiments["dispersion"]
     initial, final = nearest_mean(poses[0]), nearest_mean(poses[300])
     assert final > 0.5 and final > initial * 1.5
-    assert sum(row[3:] == (0, 255, 0) for row in poses[300].values()) >= 20
+    assert sum(row[4:] == (0, 255, 0) for row in poses[300].values()) >= 20
 
 
 def test_gathering_approaches_a_stationary_leader(experiments):
