@@ -1,0 +1,47 @@
+name: test
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      phyelds_ref:
+        description: Phyelds revision containing phyelds-argos
+        default: master
+        required: true
+jobs:
+  examples:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: examples
+      - uses: actions/checkout@v4
+        with:
+          repository: phyelds/phyelds
+          ref: ${{ inputs.phyelds_ref || 'master' }}
+          path: phyelds
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install native prerequisites
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ libfreeimage-dev libfreeimageplus-dev
+      - name: Build pinned ARGoS
+        run: bash phyelds/packages/phyelds-argos/ci/install-argos.sh "$RUNNER_TEMP/argos-build" "$RUNNER_TEMP/argos"
+      - name: Install packages
+        run: pip install -e phyelds -e phyelds/packages/phyelds-argos -e examples pytest pylint flake8
+      - name: Check programs and real experiments
+        working-directory: examples
+        env:
+          CMAKE_PREFIX_PATH: ${{ runner.temp }}/argos
+          ARGOS_PLUGIN_PATH: ${{ runner.temp }}/argos/lib/argos3
+          LD_LIBRARY_PATH: ${{ runner.temp }}/argos/lib/argos3
+        run: |
+          export PATH="$RUNNER_TEMP/argos/bin:$PATH"
+          python -m pytest -q
+          python -m pylint src
+          python -m flake8 src
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: argos-logs
+          path: examples/build/*.log
