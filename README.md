@@ -43,8 +43,8 @@ sudo cmake --install argos3/build_simulator
 sudo ldconfig
 ```
 
-The dependencies are pinned to [the state API update](https://github.com/phyelds/phyelds/commit/ba003715ff03b0b0034be480dc37e9660b304837)
-until its release is available on PyPI. State operations return plain Python values.
+The examples require phyelds 10.0 or newer (below 11.0), installed from PyPI.
+State operations return plain Python values.
 
 From this project's root:
 
@@ -170,9 +170,9 @@ gradient reaches every e-puck only through the eye-bots, and that both types ali
 C++ **test observer** reads ground-truth poses for these assertions; they are
 never available to the aggregate programs. Logs are kept in `build/*.log`.
 
-CI builds a pinned ARGoS revision and installs both projects from source. It
-expects the selected Phyelds revision to contain this integration; the manual
-workflow accepts `phyelds_ref` for testing a development branch.
+CI builds a pinned ARGoS revision and tests the examples against the PyPI release.
+The manual workflow accepts `phyelds_ref` to install Phyelds and its ARGoS extension
+from a development branch instead.
 
 To regenerate the pictures, build with GUI support and use a working graphical
 display (or `xvfb-run`), with FFmpeg installed:
