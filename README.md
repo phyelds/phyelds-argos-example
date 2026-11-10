@@ -43,7 +43,10 @@ sudo cmake --install argos3/build_simulator
 sudo ldconfig
 ```
 
-From this project's root (`phyelds-argos` 8.10.0 or later, from PyPI):
+The dependencies are pinned to [the state API update](https://github.com/phyelds/phyelds/commit/ba003715ff03b0b0034be480dc37e9660b304837)
+until its release is available on PyPI. State operations return plain Python values.
+
+From this project's root:
 
 ```bash
 uv venv --python 3.13
