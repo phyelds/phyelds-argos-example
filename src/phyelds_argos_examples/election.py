@@ -14,7 +14,7 @@ def main() -> tuple[int, int, int]:
     leader = elected == local_id()
     hops = distance_to(leader)
     count = count_nodes(hops)
-    total = int(broadcast(leader, count))
+    total = broadcast(leader, count)
     label.send(f"{int(hops)}/{total}" if hops < float("inf") else f"?/{total}")
-    led.send((255, 0, 0) if leader else hue(60 + 30 * min(float(hops), 7)))
+    led.send((255, 0, 0) if leader else hue(60 + 30 * min(hops, 7)))
     return int(hops) if hops < float("inf") else -1, total, elected
