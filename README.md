@@ -44,7 +44,6 @@ sudo ldconfig
 ```
 
 The examples require phyelds 10.0 or newer (below 11.0), installed from PyPI.
-State operations return plain Python values.
 
 From this project's root:
 
