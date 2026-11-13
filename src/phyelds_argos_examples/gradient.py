@@ -12,7 +12,7 @@ from phyelds_argos_examples.common import hue
 def main() -> float:
     """Colour each robot by its distance along the radio network."""
     is_source = source.sense()
-    distance = float(distance_to(is_source, neighbors_distances()))
+    distance = distance_to(is_source, neighbors_distances())
     led.send((255, 255, 255) if is_source else hue(min(distance, 6) * 45))
     label.send(f"{int(distance * 100)}cm" if math.isfinite(distance) else "?")
     return distance

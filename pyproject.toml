@@ -9,7 +9,8 @@ packages = [{ include = "phyelds_argos_examples", from = "src" }]
 
 [tool.poetry.dependencies]
 python = ">=3.12,<3.14"
-phyelds-argos = "^8.10.0"
+phyelds = "^10.0.0"
+phyelds-argos = "^10.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.3"

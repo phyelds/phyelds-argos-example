@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
     inputs:
       phyelds_ref:
-        description: Phyelds revision containing phyelds-argos
-        default: master
-        required: true
+        description: Optional Phyelds source revision (empty uses the PyPI release)
+        default: ""
+        required: false
 jobs:
   examples:
     runs-on: ubuntu-24.04
@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: phyelds/phyelds
-          ref: ${{ inputs.phyelds_ref || 'master' }}
+          ref: ${{ inputs.phyelds_ref || '10.0.0' }}
           path: phyelds
       - uses: actions/setup-python@v5
         with:
@@ -28,7 +28,14 @@ jobs:
       - name: Build pinned ARGoS
         run: bash phyelds/packages/phyelds-argos/ci/install-argos.sh "$RUNNER_TEMP/argos-build" "$RUNNER_TEMP/argos"
       - name: Install packages
-        run: pip install -e phyelds -e phyelds/packages/phyelds-argos -e examples pytest pylint flake8
+        env:
+          PHYELDS_REF: ${{ inputs.phyelds_ref }}
+        run: |
+          if [ -n "$PHYELDS_REF" ]; then
+            pip install -e phyelds -e phyelds/packages/phyelds-argos -e examples pytest pylint flake8
+          else
+            pip install -e examples pytest pylint flake8
+          fi
       - name: Check programs and real experiments
         working-directory: examples
         env:
